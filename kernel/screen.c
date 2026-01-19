@@ -14,3 +14,25 @@ void clear_screen(void)
         video_memory[i + 1] = 0x07;
     }
 }
+
+void clear_default_cursor(void)
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
+}
+
+void print(const char *str, unsigned char color) {
+    print_(str, color, 0, 0);
+}
+
+void print_(const char *str, unsigned char color, int x, int y) {
+    char *video = (char*) VIDEO_MEMORY;
+    int offset = (y * SCREEN_WIDTH + x) * 2;
+    int i = 0;
+
+    while (str[i] != '\0') {
+        video[offset + i * 2] = str[i];
+        video[offset + i * 2 + 1] = color;
+        i++;
+    }
+}
