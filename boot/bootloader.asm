@@ -18,6 +18,7 @@ start:
     mov al, 16
     mov cl, 0x02
     mov ch, 0x00
+    mov ah, 0x02
     int 0x13
 
     jc disk_error

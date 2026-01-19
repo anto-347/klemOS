@@ -1,42 +1,59 @@
 BOOT_DIR = boot
 KERNEL_DIR = kernel
 BUILD_DIR = build
+BUILD_BIN_DIR = $(BUILD_DIR)/bin
+BUILD_OBJ_DIR = $(BUILD_DIR)/obj
+
 
 BOOTLOADER_SRC = $(BOOT_DIR)/bootloader.asm
 KERNEL_ENTRY_SRC = $(KERNEL_DIR)/kernel_entry.asm
-KERNEL_C_SRC = $(KERNEL_DIR)/main.c
-BOOTLOADER_BIN = $(BUILD_DIR)/bin/bootloader.bin
-KERNEL_ENTRY_OBJ = $(BUILD_DIR)/obj/kernel_entry.o
-KERNEL_C_OBJ = $(BUILD_DIR)/obj/main.o
-KERNEL_BIN = $(BUILD_DIR)/bin/kernel.bin
-OS_IMG = $(BUILD_DIR)/bin/os.img
+KERNEL_C_SRCS = $(shell find $(KERNEL_DIR) -name '*.c')
 
-C_FLAGS = -m32 -ffreestanding -fno-pie -fno-pic -nostdlib -fno-stack-protector
 
-all: $(OS_IMG)
+KERNEL_ENTRY_OBJ = $(BUILD_OBJ_DIR)/kernel_entry.o
+KERNEL_C_OBJS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_OBJ_DIR)/%.o, $(KERNEL_C_SRCS))
 
-$(BOOTLOADER_BIN): $(BOOTLOADER_SRC) | $(BUILD_DIR)/bin
+
+CFLAGS = -m32 -ffreestanding -fno-pie -fno-pic -nostdlib -fno-stack-protector -I$(KERNEL_DIR)
+
+
+all: $(BUILD_BIN_DIR)/os.img
+
+
+$(BUILD_BIN_DIR)/bootloader.bin: $(BOOTLOADER_SRC) | $(BUILD_BIN_DIR)
 	nasm -f bin $< -o $@
 
-$(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC) | $(BUILD_DIR)/obj
+
+$(KERNEL_ENTRY_OBJ): $(KERNEL_ENTRY_SRC) | $(BUILD_OBJ_DIR)
 	nasm -f elf32 $< -o $@
 
-$(KERNEL_C_OBJ): $(KERNEL_C_SRC) | $(BUILD_DIR)/obj
-	gcc $(C_FLAGS) -c $< -o $@
 
-$(KERNEL_BIN): $(KERNEL_ENTRY_OBJ) $(KERNEL_C_OBJ) linker.ld | $(BUILD_DIR)/bin
-	ld -m elf_i386 -T linker.ld -o $@ $(KERNEL_ENTRY_OBJ) $(KERNEL_C_OBJ) --oformat binary
+$(BUILD_OBJ_DIR)/%.o: $(KERNEL_DIR)/%.c | $(BUILD_OBJ_DIR)
+	@mkdir -p $(dir $@)
+	gcc $(CFLAGS) -c $< -o $@
+
+
+$(BUILD_BIN_DIR)/kernel.bin: $(KERNEL_ENTRY_OBJ) $(KERNEL_C_OBJS) linker.ld | $(BUILD_BIN_DIR)
+	ld -m elf_i386 -T linker.ld -o $@ $(KERNEL_ENTRY_OBJ) $(KERNEL_C_OBJS) --oformat binary
 	truncate -s 8192 $@
 
-$(OS_IMG): $(BOOTLOADER_BIN) $(KERNEL_BIN)
+
+$(BUILD_BIN_DIR)/os.img: $(BUILD_BIN_DIR)/bootloader.bin $(BUILD_BIN_DIR)/kernel.bin
 	cat $^ > $@
 
-
 clean:
-	rm -rf $(BUILD_DIR)/bin/*
-	rm -rf $(BUILD_DIR)/obj/*
+	rm -rf $(BUILD_BIN_DIR)/*
+	rm -rf $(BUILD_OBJ_DIR)/*
 
-run: $(OS_IMG)
-	qemu-system-i386 -drive format=raw,file=$^
+run: $(BUILD_BIN_DIR)/os.img
+	qemu-system-i386 -drive file=$<,format=raw
 
-.PHONY: all clean run
+# Debug
+debug-files:
+	@echo "Sources C trouvés :"
+	@echo $(KERNEL_C_SRCS)
+	@echo ""
+	@echo "Objets qui seront créés :"
+	@echo $(KERNEL_C_OBJS)
+
+.PHONY: all clean run debug-files
