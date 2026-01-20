@@ -14,7 +14,7 @@ KERNEL_ENTRY_OBJ = $(BUILD_OBJ_DIR)/kernel_entry.o
 KERNEL_C_OBJS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_OBJ_DIR)/%.o, $(KERNEL_C_SRCS))
 
 
-CFLAGS = -m32 -ffreestanding -fno-pie -fno-pic -nostdlib -fno-stack-protector -I$(KERNEL_DIR)
+CFLAGS = -m32 -ffreestanding -fno-pie -fno-pic -nostdlib -fno-stack-protector -O -I$(KERNEL_DIR)
 
 
 all: $(BUILD_BIN_DIR)/os.img

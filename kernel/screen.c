@@ -1,4 +1,5 @@
 #include "../include/screen.h"
+#include "../lib/h/io.h"
 
 
 #define VIDEO_MEMORY 0xb8000
@@ -17,7 +18,9 @@ void clear_screen(void)
 
 void clear_default_cursor(void)
 {
-    outb(0x3D4, 0x0A);
+    // outb(0x3D4, 0x0A);
+    // outb(0x3D5, 0x20); 
+    outb(0x3D4, 0xE);
     outb(0x3D5, 0x20);
 }
 
