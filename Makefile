@@ -34,14 +34,13 @@ $(BUILD_OBJ_DIR)/%.o: $(KERNEL_DIR)/%.c | $(BUILD_OBJ_DIR)
 	@mkdir -p $(dir $@)
 	gcc $(CFLAGS) -c $< -o $@
 
+$(BUILD_OBJ_DIR)/%.o: $(KERNEL_DIR)/%.asm | $(BUILD_OBJ_DIR)
+	@mkdir -p $(dir $@)
+	nasm -f elf32 $< -o $@
 
 $(BUILD_BIN_DIR)/kernel.bin: $(KERNEL_ENTRY_OBJ) $(KERNEL_C_OBJS) $(KERNEL_ASM_OBJS) linker.ld | $(BUILD_BIN_DIR)
 	ld -m elf_i386 -T linker.ld -o $@ $(KERNEL_ENTRY_OBJ) $(KERNEL_C_OBJS) $(KERNEL_ASM_OBJS) --oformat binary
 	truncate -s 8192 $@
-
-$(BUILD_OBJ_DIR)/%.o: $(KERNEL_DIR)/%.asm | $(BUILD_OBJ_DIR)
-	@mkdir -p $(dir $@)
-	nasm -f elf32 $< -o $@
 
 $(BUILD_BIN_DIR)/os.img: $(BUILD_BIN_DIR)/bootloader.bin $(BUILD_BIN_DIR)/kernel.bin
 	cat $^ > $@
