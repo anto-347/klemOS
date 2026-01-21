@@ -1,5 +1,11 @@
 #include "../lib/h/types.h"
 #include "../include/idt.h"
+#include "../include/pic.h"
+
+struct idt_entry idt[256];
+struct idtr idtr;
+
+extern void keyboard_interrupt_handler(void);
 
 void idt_set_gate(uint8_t num, uint32_t handler, uint16_t selector, uint8_t flags)
 {
@@ -12,7 +18,7 @@ void idt_set_gate(uint8_t num, uint32_t handler, uint16_t selector, uint8_t flag
 
 extern void idt_load(uint32_t);
 
-void init_idt(void)
+void idt_init(void)
 {
     idtr.base = (uint32_t)&idt;
     idtr.limit = (sizeof(struct idt_entry) * 256) - 1;
@@ -24,6 +30,10 @@ void init_idt(void)
         idt[i].type_attr = 0;
         idt[i].zero = 0;
     }
+
+    pic_remap(0x20, 0x28);
+
+    idt_set_gate(33, (uint32_t)keyboard_interrupt_handler, 0x08, 0x8E);
 
     idt_load((uint32_t)&idt);
 }
