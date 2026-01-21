@@ -6,6 +6,6 @@ void prepare_screen(void)
     clear_screen();
     clear_default_cursor();
 
-    print_("Chargement...", 0x0F, 0, 0);
-    print_("klemOS", 0x0F, 0, 1);
+    print_("Chargement...", 0x0F, 30, 0);
+    print_("klemOS", 0x0F, 30, 2);
 }
