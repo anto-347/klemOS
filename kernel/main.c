@@ -21,7 +21,7 @@ void main(void)
 
     video[8] = '2';
     video[9] = 0x0F;
-    // asm volatile ("sti");
+    asm volatile ("sti");
 
     while(1)
     {

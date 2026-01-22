@@ -6,6 +6,7 @@ struct idt_entry idt[256];
 struct idtr idtr;
 
 extern void keyboard_interrupt_handler(void);
+extern void default_interrupt_handler(void);
 
 void idt_set_gate(uint8_t num, uint32_t handler, uint16_t selector, uint8_t flags)
 {
@@ -33,7 +34,13 @@ void idt_init(void)
 
     pic_remap(0x20, 0x28);
 
-    idt_set_gate(33, (uint32_t)keyboard_interrupt_handler, 0x08, 0x8E);
+    for (int i = 32; i < 48; i++) {
+        if (i == 33) {
+            idt_set_gate(i, (uint32_t)keyboard_interrupt_handler, 0x08, 0x8E);
+        } else {
+            idt_set_gate(i, (uint32_t)default_interrupt_handler, 0x08, 0x8E);
+        }
+    }
 
-    idt_load((uint32_t)&idt);
+    idt_load((uint32_t)&idtr);
 }

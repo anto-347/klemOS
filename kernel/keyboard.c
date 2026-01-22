@@ -8,16 +8,15 @@ void keyboard_handler(void)
 
     char *video = (char*) 0xB8000;
     static int pos = 0;
-    video[pos * 2] = 'X';
-    video[pos * 2 + 1] = 0x0F;
-    pos++;
 
     if (pos >= 80 * 25)
     {
         pos = 0;
     }
 
-    pic_send_eoi(1);
+    video[pos * 2] = 'X';
+    video[pos * 2 + 1] = 0x0F;
+    pos++;
 }
 
 void keyboard_init(void)

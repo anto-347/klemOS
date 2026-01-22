@@ -1,7 +1,6 @@
-global keyboard_interrupt_handler
-extern keyboard_handler
+global default_interrupt_handler
 
-keyboard_interrupt_handler:
+default_interrupt_handler:
     pusha
     push ds
     push es
@@ -13,8 +12,6 @@ keyboard_interrupt_handler:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    
-    call keyboard_handler
 
     mov al, 0x20
     out 0x20, al
