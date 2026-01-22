@@ -16,8 +16,6 @@ keyboard_interrupt_handler:
     
     call keyboard_handler
 
-    mov al, 0x20
-    out 0x20, al
 
     pop gs
     pop fs
