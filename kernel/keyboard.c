@@ -1,13 +1,26 @@
 #include "../include/keyboard.h"
 
 
+
 static char scancode_to_ascii[] = {
-    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0,
+    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'B',
     0, 'a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
     0, 'q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', '%', '*',
-    0, '\\', 'w', 'x', 'c', 'v', 'b', 'n', ',', ';', ':', '!', 0,
+    'M', '\\', 'w', 'x', 'c', 'v', 'b', 'n', ',', ';', ':', '!', 0,
     '*', 0, ' '
 };
+
+
+static char min_chars[] = {
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+};
+
+static char maj_chars[] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+};
+
 
 void keyboard_handler(void)
 {
@@ -30,6 +43,7 @@ void keyboard_handler(void)
         return;
     }
 
+
     if (!menuPassed && scancode == 0x1C)
     {
         showShell(1);
@@ -42,20 +56,45 @@ void keyboard_handler(void)
     }
     else
     {
-        if (ascii != 0) {    
-            char str[2];
-            str[0] = ascii;
-            str[1] = '\0';
-    
-            print_(str, 0x0F, xCursorShell, yCursorShell);
-    
-            xCursorShell++;
-            if (xCursorShell >= 80) {
-                xCursorShell = 0;
-                yCursorShell++;
-            }
-            cursor_to(xCursorShell, yCursorShell);
+        if (ascii == 0) {
+            pic_send_eoi(1);
+            return;
         }
+
+        if (ascii == 'B') {
+            char str = ' ';
+            print_(&str, 0x0F, xCursorShell, yCursorShell);
+
+            idxIptUser--;
+            iptUser[idxIptUser] = ' ';
+            xCursorShell--;
+
+            if (xCursorShell < 0) {
+                yCursorShell--;
+                xCursorShell = 80;
+            }
+
+            cursor_to(xCursorShell, yCursorShell);
+
+            pic_send_eoi(1);
+            return;
+        }
+
+        char str[2];
+        str[0] = ascii;
+        str[1] = '\0';
+
+        iptUser[idxIptUser] = *str;
+        idxIptUser++;
+
+        print_(str, 0x0F, xCursorShell, yCursorShell);
+
+        xCursorShell++;
+        if (xCursorShell >= 80) {
+            xCursorShell = 0;
+            yCursorShell++;
+        }
+        cursor_to(xCursorShell, yCursorShell);
     }
 
     pic_send_eoi(1);
