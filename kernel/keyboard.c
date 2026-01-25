@@ -1,9 +1,4 @@
 #include "../include/keyboard.h"
-#include "../include/pic.h"
-#include "../lib/h/io.h"
-#include "../lib/h/types.h"
-#include "../include/screen.h"
-#include "../include/var.h"
 
 
 static char scancode_to_ascii[] = {
@@ -28,14 +23,6 @@ void keyboard_handler(void)
     if (scancode < sizeof(scancode_to_ascii))
     {
         ascii = scancode_to_ascii[scancode];
-        if (menuPassed)
-        {
-            print_("oui", 0x0F, 50, 20);
-        }
-        else
-        {
-            print_("non", 0x0F, 50, 20);
-        }
     } 
     else
     {
@@ -45,8 +32,8 @@ void keyboard_handler(void)
 
     if (!menuPassed && scancode == 0x1C)
     {
-        // montrer terminal
-        menuPassed == 1;
+        showShell(1);
+        menuPassed = 1;
     }
     else if (!menuPassed && scancode != 0x1C)
     {
@@ -55,21 +42,19 @@ void keyboard_handler(void)
     }
     else
     {
-        if (ascii != 0) {
-            static int x = 0;
-            static int y = 0;
-    
+        if (ascii != 0) {    
             char str[2];
             str[0] = ascii;
             str[1] = '\0';
     
-            print_(str, 0x0F, x, y);
+            print_(str, 0x0F, xCursorShell, yCursorShell);
     
-            x++;
-            if (x >= 79) {
-                x = 0;
-                y++;
+            xCursorShell++;
+            if (xCursorShell >= 80) {
+                xCursorShell = 0;
+                yCursorShell++;
             }
+            cursor_to(xCursorShell, yCursorShell);
         }
     }
 
@@ -78,5 +63,7 @@ void keyboard_handler(void)
 
 void keyboard_init(void)
 {
-    
+    for (int i = 0; i < 256; i++) {
+        iptUser[i] = ' ';
+    }
 }

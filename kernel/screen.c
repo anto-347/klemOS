@@ -39,3 +39,22 @@ void print_(const char *str, unsigned char color, int x, int y)
         i++;
     }
 }
+
+void basic_cursor(void)
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x0D);
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, 0x0E);
+}
+
+void cursor_to(int x, int y)
+{
+    uint8_t pos = y * 80 + x;
+
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (pos >> 8) & 0xFF);
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, pos & 0xFF);
+}
