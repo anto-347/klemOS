@@ -1,5 +1,4 @@
 #include "../include/screen.h"
-#include "../lib/h/io.h"
 
 
 #define VIDEO_MEMORY 0xb8000
@@ -57,4 +56,41 @@ void cursor_to(int x, int y)
 
     outb(0x3D4, 0x0F);
     outb(0x3D5, pos & 0xFF);
+}
+
+void backspace(void)
+{
+    char str = ' ';
+    print_(&str, 0x0F, xCursorShell, yCursorShell);
+
+    idxIptUser--;
+    iptUser[idxIptUser] = ' ';
+    xCursorShell--;
+
+    if (xCursorShell < 0) {
+        yCursorShell --;
+        xCursorShell = 80;
+    }
+
+    cursor_to(xCursorShell, yCursorShell);
+
+    pic_send_eoi(1);
+}
+
+void print_from_keyboard(char ascii)
+{
+    char str[2];
+    str[0] = ascii;
+    str[1] = '\0';
+    iptUser[idxIptUser] = *str;
+    idxIptUser++;
+
+    print_(str, 0x0F, xCursorShell, yCursorShell);
+    xCursorShell++;
+    if (xCursorShell >= 80) {
+        xCursorShell = 0;
+        yCursorShell++;
+    }
+
+    cursor_to(xCursorShell, yCursorShell);
 }

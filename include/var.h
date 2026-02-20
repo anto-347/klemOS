@@ -1,5 +1,5 @@
 #ifndef VAR_H
-#define VAR_h
+#define VAR_H
 
 
 extern int menuPassed;

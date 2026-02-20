@@ -62,39 +62,11 @@ void keyboard_handler(void)
         }
 
         if (ascii == 'B') {
-            char str = ' ';
-            print_(&str, 0x0F, xCursorShell, yCursorShell);
-
-            idxIptUser--;
-            iptUser[idxIptUser] = ' ';
-            xCursorShell--;
-
-            if (xCursorShell < 0) {
-                yCursorShell--;
-                xCursorShell = 80;
-            }
-
-            cursor_to(xCursorShell, yCursorShell);
-
-            pic_send_eoi(1);
+            backspace();
             return;
         }
 
-        char str[2];
-        str[0] = ascii;
-        str[1] = '\0';
-
-        iptUser[idxIptUser] = *str;
-        idxIptUser++;
-
-        print_(str, 0x0F, xCursorShell, yCursorShell);
-
-        xCursorShell++;
-        if (xCursorShell >= 80) {
-            xCursorShell = 0;
-            yCursorShell++;
-        }
-        cursor_to(xCursorShell, yCursorShell);
+        print_from_keyboard(ascii);
     }
 
     pic_send_eoi(1);
