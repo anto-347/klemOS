@@ -42,14 +42,14 @@ void print_(const char *str, unsigned char color, int x, int y)
 void basic_cursor(void)
 {
     outb(0x3D4, 0x0A);
-    outb(0x3D5, 0x0D);
+    outb(0x3D5, 0x00);
     outb(0x3D4, 0x0B);
-    outb(0x3D5, 0x0E);
+    outb(0x3D5, 0x0F);
 }
 
 void cursor_to(int x, int y)
 {
-    uint8_t pos = y * 80 + x;
+    uint16_t pos = y * 80 + x;
 
     outb(0x3D4, 0x0E);
     outb(0x3D5, (pos >> 8) & 0xFF);
@@ -60,19 +60,21 @@ void cursor_to(int x, int y)
 
 void backspace(void)
 {
-    char str = ' ';
-    
-    idxIptUser--;
-    iptUser[idxIptUser] = ' ';
-    xCursorShell--;
-    
-    if (xCursorShell < 0) {
-        yCursorShell--;
-        xCursorShell = 80;
+    if (idxIptUser > 0) {
+        char str[2];
+        str[0] = ' ';
+        str[1] = '\0';
+        idxIptUser--;
+        iptUser[idxIptUser] = ' ';
+        xCursorShell--;
+        if (xCursorShell < 0) {
+            yCursorShell--;
+            xCursorShell = 80;
+        }
+        
+        print_(str, 0x0F, xCursorShell, yCursorShell);
+        cursor_to(xCursorShell, yCursorShell);
     }
-    
-    print_(&str, 0x00, xCursorShell, yCursorShell);
-    cursor_to(xCursorShell, yCursorShell);
 
     pic_send_eoi(1);
 }
