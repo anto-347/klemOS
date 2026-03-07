@@ -2,23 +2,20 @@
 
 
 
-static char scancode_to_ascii[] = {
-    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'B',
-    0, 'a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
+static char scancode_to_ascii_min[] = {
+    0, 0, '&', 0, '"', '\'', '(', '-', 0, '_', 0, 0, ')', '=', 'B',
+    0, 'a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 0, '$', 'E',
     0, 'q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', '%', '*',
-    'M', '\\', 'w', 'x', 'c', 'v', 'b', 'n', ',', ';', ':', '!', 0,
-    '*', 0, ' '
+    'M', '<', 'w', 'x', 'c', 'v', 'b', 'n', ',', ';', ':', '!', 0,
+    0, 0, ' '
 };
 
-
-static char min_chars[] = {
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-};
-
-static char maj_chars[] = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+static char scancode_to_ascii_maj[] = {
+    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 0, '+', 'b',
+    0, 'A', 'Z', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 0, 0, 'e',
+    0, 'Q', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', '%', '*',
+    'm', '>', 'W', 'X', 'C', 'V', 'B', 'N', '?', '.', '/', '!', 'm',
+    0, 0, ' '
 };
 
 
@@ -33,9 +30,9 @@ void keyboard_handler(void)
     }
 
     char ascii = 0;
-    if (scancode < sizeof(scancode_to_ascii))
+    if (scancode < sizeof(scancode_to_ascii_min))
     {
-        ascii = scancode_to_ascii[scancode];
+        ascii = scancode_to_ascii_min[scancode];
     } 
     else
     {

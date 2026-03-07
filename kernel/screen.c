@@ -61,17 +61,17 @@ void cursor_to(int x, int y)
 void backspace(void)
 {
     char str = ' ';
-    print_(&str, 0x0F, xCursorShell, yCursorShell);
-
+    
     idxIptUser--;
     iptUser[idxIptUser] = ' ';
     xCursorShell--;
-
+    
     if (xCursorShell < 0) {
-        yCursorShell --;
+        yCursorShell--;
         xCursorShell = 80;
     }
-
+    
+    print_(&str, 0x00, xCursorShell, yCursorShell);
     cursor_to(xCursorShell, yCursorShell);
 
     pic_send_eoi(1);
