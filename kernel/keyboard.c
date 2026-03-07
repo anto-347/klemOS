@@ -77,6 +77,8 @@ void keyboard_handler(void)
             return;
         } else if (ascii == selecteurMaj) {
             isMajOn ^= 1;
+        } else if (ascii == selecteurEntree) {
+            entree_keyboard(ascii);
         } else {
             print_from_keyboard(ascii);
         }

@@ -96,3 +96,22 @@ void print_from_keyboard(char ascii)
 
     cursor_to(xCursorShell, yCursorShell);
 }
+
+void entree_keyboard(char ascii)
+{
+    if (idxIptUser > 0) {
+        // gérer ipt
+    } else {
+        clear_batcher();
+        new_line_shell();
+    }
+}
+
+void new_line_shell(void) {
+    if (yCursorShell < 23) {
+        xCursorShell = 6;
+        yCursorShell += 2;
+        print_("-> $ ", 0x0A, 0, yCursorShell);
+        cursor_to(xCursorShell, yCursorShell);
+    }
+}
