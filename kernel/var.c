@@ -8,3 +8,5 @@ int idxIptUser = 0;
 
 int xCursorShell = 0;
 int yCursorShell = 0;
+
+int isMajOn = 0;

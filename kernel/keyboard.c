@@ -23,6 +23,10 @@ void keyboard_handler(void)
 {
     uint8_t scancode = inb(0x60);
 
+    char selecteurMaj;
+    char selecteurEntree;
+    char selecteurBackspace;
+
     if (scancode & 0x80 )
     {
         pic_send_eoi(1);
@@ -30,40 +34,53 @@ void keyboard_handler(void)
     }
 
     char ascii = 0;
-    if (scancode < sizeof(scancode_to_ascii_min))
-    {
-        ascii = scancode_to_ascii_min[scancode];
-    } 
-    else
-    {
-        pic_send_eoi(1);
-        return;
+    if (isMajOn) {
+        if (scancode < sizeof(scancode_to_ascii_maj)) {
+            ascii = scancode_to_ascii_maj[scancode];
+        } else {
+            pic_send_eoi(1);
+            return;
+        }
+    } else {
+        if (scancode < sizeof(scancode_to_ascii_min)) {
+            ascii = scancode_to_ascii_min[scancode];
+        } else {
+            pic_send_eoi(1);
+            return;
+        }
     }
 
-
-    if (!menuPassed && scancode == 0x1C)
-    {
+    if (!menuPassed && scancode == 0x1C) {
         showShell(1);
         menuPassed = 1;
-    }
-    else if (!menuPassed && scancode != 0x1C)
-    {
+    } else if (!menuPassed && scancode != 0x1C) {
         pic_send_eoi(1);
         return;
-    }
-    else
-    {
+    } else {
+        if (isMajOn) {
+            selecteurMaj = 'm';
+            selecteurEntree = 'e';
+            selecteurBackspace = 'b';
+        } else {
+            selecteurMaj = 'M';
+            selecteurEntree = 'E';
+            selecteurBackspace = 'B';
+        }
+
         if (ascii == 0) {
             pic_send_eoi(1);
             return;
         }
 
-        if (ascii == 'B') {
+        if (ascii == selecteurBackspace) {
             backspace();
             return;
+        } else if (ascii == selecteurMaj) {
+            isMajOn ^= 1;
+        } else {
+            print_from_keyboard(ascii);
         }
 
-        print_from_keyboard(ascii);
     }
 
     pic_send_eoi(1);

@@ -7,5 +7,6 @@ extern char iptUser[256];
 extern int idxIptUser;
 extern int xCursorShell;
 extern int yCursorShell;
+extern int isMajOn;
 
 #endif
